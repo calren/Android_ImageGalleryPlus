@@ -10,6 +10,9 @@ import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.caren.imagegalleryplus.models.DataBaseHandler;
+import com.example.caren.imagegalleryplus.models.Picture;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -22,6 +25,7 @@ public class MainActivity extends Activity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 1;
     String mCurrentPhotoPath;
+    DataBaseHandler db;
 
 
     @Override
@@ -33,9 +37,14 @@ public class MainActivity extends Activity {
         cc = this.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null,
                 null);
-        System.out.println("num of pictures = " + Integer.toString(cc.getCount()));
+//        System.out.println("num of pictures = " + Integer.toString(cc.getCount()));
+
+        db = new DataBaseHandler(this);
+
+        System.out.println("num of pictures in database: " + db.getPicturesCount());
 
         dispatchTakePictureIntent();
+
 
     }
 
@@ -60,6 +69,7 @@ public class MainActivity extends Activity {
 
     // starts the camera to take a picture
     private void dispatchTakePictureIntent() {
+        String currentDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -74,6 +84,8 @@ public class MainActivity extends Activity {
             if (photoFile != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         Uri.fromFile(photoFile));
+
+                db.addPicture(new Picture(Uri.fromFile(photoFile).toString(), currentDate));
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }

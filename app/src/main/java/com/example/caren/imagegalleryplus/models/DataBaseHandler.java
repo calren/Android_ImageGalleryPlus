@@ -21,7 +21,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "picturesManager";
 
     // Contacts table name
-    private static final String TABLE_CONTACTS = "pictures";
+    private static final String TABLE_PICTURES = "pictures";
 
     // Contacts Table Columns names
     private static final String KEY_ID = "id";
@@ -34,10 +34,9 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     }
 
     // Creating Tables
-    // TODO
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_PICTURES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
                 + KEY_DATE + " TEXT," + KEY_LOCATION + " TEXT" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
@@ -47,7 +46,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PICTURES);
 
         // Create tables again
         onCreate(db);
@@ -58,7 +57,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
      */
 
     // Adding new contact
-    void addPicture(Picture picture) {
+    public void addPicture(Picture picture) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -67,7 +66,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         values.put(KEY_LOCATION, picture.get_location());
 
         // Inserting Row
-        db.insert(TABLE_CONTACTS, null, values);
+        db.insert(TABLE_PICTURES, null, values);
         db.close(); // Closing database connection
     }
 
@@ -75,7 +74,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
     public List<Picture> getAllPictures() {
         List<Picture> pictures = new ArrayList<Picture>();
         // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_CONTACTS;
+        String selectQuery = "SELECT  * FROM " + TABLE_PICTURES;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -100,14 +99,17 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
 
     // Getting contacts Count
-    public int getContactsCount() {
-        String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
+    public int getPicturesCount() {
+        int count = 0;
+        String countQuery = "SELECT  * FROM " + TABLE_PICTURES;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
-        cursor.close();
 
-        // return count
-        return cursor.getCount();
+        if(cursor != null && !cursor.isClosed()){
+            count = cursor.getCount();
+            cursor.close();
+        }
+        return count;
     }
 
 }
